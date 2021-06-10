@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  main:
+    depends_on:
+      - flask
+      - nginx
+    container_name: main
+    build:
+      context: ./
+    ports:
+      - 80:80
+
+
+  flask:
+    # restart: always
+    depends_on:
+      - redis
+    build: ./flask
+    volumes:
+      - ./flask/app.py:/usr/local/app/
+    ports:
+      - 8090:5000
+    links:
+      - redis
+    # environment:
+    #   FLASK_ENV: development
+
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 8091:80
+    volumes:
+      - ./nginx/data:/usr/share/nginx/html/
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
